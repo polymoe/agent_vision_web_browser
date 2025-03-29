@@ -3,6 +3,7 @@ from io import BytesIO
 from time import sleep
 import tempfile 
 
+from transformers import AutoTokenizer
 import helium
 from dotenv import load_dotenv
 from PIL import Image
@@ -31,17 +32,41 @@ def parse_arguments():
         default=alfred_guest_list_request,
         help="The prompt to run with the agent",
     )
+    # parser.add_argument(
+    #     "--model-type",
+    #     type=str,
+    #     default="LiteLLMModel",
+    #     help="The model type to use (e.g., OpenAIServerModel, LiteLLMModel, TransformersModel, HfApiModel)",
+    # )
+    # parser.add_argument(
+    #     "--model-id",
+    #     type=str,
+    #     default="gpt-4o",
+    #     help="The model ID to use for the specified model type",
+    # )
     parser.add_argument(
         "--model-type",
         type=str,
-        default="LiteLLMModel",
+        default="HfApiModel",  # Updated to use HfApiModel
         help="The model type to use (e.g., OpenAIServerModel, LiteLLMModel, TransformersModel, HfApiModel)",
     )
     parser.add_argument(
         "--model-id",
         type=str,
-        default="gpt-4o",
+        default="Qwen/Qwen2.5-Coder-32B-Instruct",  # Updated to use Qwen/Qwen2.5-Coder-32B-Instruct
         help="The model ID to use for the specified model type",
+    )
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=2096,  # Default max tokens for the Qwen model
+        help="The maximum number of tokens to generate",
+    )
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=0.5,  # Default temperature for the Qwen model
+        help="The temperature for text generation",
     )
     return parser.parse_args()
 
@@ -200,6 +225,14 @@ def main():
 
     # Parse command line arguments
     args = parse_arguments()
+
+    # Initialize the tokenizer for the model
+    tokenizer = AutoTokenizer.from_pretrained(args.model_id)
+
+    # Truncate the input prompt to fit within the token limit
+    max_input_tokens = 32768 - args.max_tokens  # Reserve space for output tokens
+    input_tokens = tokenizer.encode(args.prompt, truncation=True, max_length=max_input_tokens)
+    truncated_prompt = tokenizer.decode(input_tokens)
 
     # Initialize the model based on the provided arguments
     model = load_model(args.model_type, args.model_id)

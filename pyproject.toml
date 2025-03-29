@@ -13,6 +13,7 @@ pillow = "^11.1.0"
 python-dotenv = "^1.1.0"
 smolagents = {extras = ["litellm"], version = "^1.12.0"}
 chromedriver-py = "134.0.6998.165"
+transformers = "^4.50.3"
 
 
 [build-system]
