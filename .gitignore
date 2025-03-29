@@ -1,0 +1,4 @@
+*.deb
+*.deb.1
+*.zip
+.env

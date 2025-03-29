@@ -1,0 +1,12 @@
+{
+    "name": "VISION_WEB_BROWSER",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "containerEnv": {
+    },
+    "remoteEnv": {
+        "PATH": "${containerEnv:PATH}:/root/.local/bin"
+    }
+}
